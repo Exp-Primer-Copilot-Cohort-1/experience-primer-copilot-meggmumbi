@@ -1,32 +1,83 @@
 // create web server
 
-// import modules
-const express = require('express')
-const app = express()
-const port = process.env.PORT || 3000
-const mongoose = require('mongoose')
-const Comment = require('./models/comment')
-const bodyParser = require('body-parser')
-const methodOverride = require('method-override')
-const commentsRoutes = require('./routes/comments')
+const express = require("express");
+const router = express.Router();
+const Comment = require("../models/comment");
+const Post = require("../models/post");
+const User = require("../models/user");
 
-// connect to mongodb
-mongoose.connect('mongodb://localhost:27017/comment2', { useNewUrlParser: true })
+// create comment
+router.post("/", async (req, res) => {
+  try {
+    const comment = new Comment(req.body);
+    await comment.save();
+    res.status(201).send(comment);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 
-// set up template engine
-app.set('view engine', 'ejs')
+// delete comment
+router.delete("/:id", async (req, res) => {
+  try {
+    const comment = await Comment.findOneAndDelete({ _id: req.params.id });
+    res.status(200).send(comment);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 
-// set up static files
-app.use(express.static('public'))
+// get all comments
+router.get("/", async (req, res) => {
+  try {
+    const comments = await Comment.find();
+    res.status(200).send(comments);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 
-// set up body-parser
-app.use(bodyParser.urlencoded({ extended: true }))
+// get comment by id
+router.get("/:id", async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.id);
+    res.status(200).send(comment);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 
-// set up method-override
-app.use(methodOverride('_method'))
+// get comments by post
+router.get("/post/:id", async (req, res) => {
+  try {
+    const comments = await Comment.find({ post: req.params.id });
+    res.status(200).send(comments);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 
-// set up routes
-app.use(commentsRoutes)
+// get comments by user
+router.get("/user/:id", async (req, res) => {
+  try {
+    const comments = await Comment.find({ author: req.params.id });
+    res.status(200).send(comments);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 
-// listen to port
-app.listen(port, () => console.log(`Server is running on port ${port}`))
+// update comment
+router.patch("/:id", async (req, res) => {
+  try {
+    const comment = await Comment.findOneAndUpdate(
+      { _id: req.params.id },
+      req.body
+    );
+    res.status(200).send(comment);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+module.exports = router;
