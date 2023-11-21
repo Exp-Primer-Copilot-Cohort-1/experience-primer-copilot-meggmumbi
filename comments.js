@@ -1,16 +1,32 @@
-// Create web server
-// Description: Create a web server that can read from a file and write to a file.
+// create web server
 
-// Load the http module to create an http server.
-var http = require('http');
-var fs = require('fs');
+// import modules
+const express = require('express')
+const app = express()
+const port = process.env.PORT || 3000
+const mongoose = require('mongoose')
+const Comment = require('./models/comment')
+const bodyParser = require('body-parser')
+const methodOverride = require('method-override')
+const commentsRoutes = require('./routes/comments')
 
-// Configure our HTTP server to respond with Hello World to all requests.
-var server = http.createServer(function (request, response) {
-    fs.readFile('index.html', function(err, data) {
-        response.writeHead(200, {'Content-Type': 'text/html'});
-        response.end(data);
-    });
-});
+// connect to mongodb
+mongoose.connect('mongodb://localhost:27017/comment2', { useNewUrlParser: true })
 
-// Listen on port 8000, IP defaults to
+// set up template engine
+app.set('view engine', 'ejs')
+
+// set up static files
+app.use(express.static('public'))
+
+// set up body-parser
+app.use(bodyParser.urlencoded({ extended: true }))
+
+// set up method-override
+app.use(methodOverride('_method'))
+
+// set up routes
+app.use(commentsRoutes)
+
+// listen to port
+app.listen(port, () => console.log(`Server is running on port ${port}`))
