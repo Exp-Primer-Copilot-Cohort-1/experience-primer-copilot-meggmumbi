@@ -1,13 +1,8 @@
 function skillsMember(){
-    var skills = {
-        name: 'Diana',
-        age: 18,
-        skills: ['JS', 'React', 'HTML', 'CSS']
-    };
-
-    var skillsJSON = JSON.stringify(skills);
-
-    document.write(skillsJSON);
-    console.log(skillsJSON);
- 
+    var member = [
+        {name: "Kadek", age: 20, hobby: "Music"},
+        {name: "Dewi", age: 25, hobby: "Traveling"},
+        {name: "Sinta", age: 22, hobby: "Reading"}
+    ]
+    return member
 }
